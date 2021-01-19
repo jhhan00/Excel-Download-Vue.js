@@ -1,17 +1,73 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <img alt="Vue logo" src="./assets/logo.png"><br/>
+    {{line}}<br/>
+    <button @click="clickAction">Click</button>
+    <br/>
+    <div>
+      <button @click="apiAction">GO</button>
+    </div>
+    <div>
+      <button @click="makeExcelFile">Excel</button>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      line: 'nothing',
+      data1: [
+        {
+          mode: 1,
+          affinity: 0.5,
+          lb: 1.34,
+          ub: 2.53,
+          pUrl: "purl1",
+          qUrl: "qurl1"
+        },
+        {
+          mode: 2,
+          affinity: 1.5,
+          lb: 13.34,
+          ub: 2.453,
+          pUrl: "purl2",
+          qUrl: "qurl2"
+        }
+      ]
+    }
+  },
+  methods: {
+    clickAction () {
+      axios.get(process.env.VUE_APP_API_ENDPOINT + "/test1").then(response => {
+        this.line = response.data
+      })
+    },
+    apiAction () {
+      console.log("action!")
+      axios.post(process.env.VUE_APP_API_ENDPOINT + "/binding", this.data1).then()
+    },
+    makeExcelFile () {
+      console.log("Excel!")
+      axios.post(process.env.VUE_APP_API_ENDPOINT + "/excel", this.data1, { responseType: 'arraybuffer' })
+          .then(result => {
+            console.log(result)
+            console.log(result.headers["content-type"])
+            const url = window.URL.createObjectURL(new Blob([result.data], { type: result.headers["content-type"] }))
+            const link = document.createElement("a")
+            link.href = url
+            link.download = "example.xlsx"
+            link.click()
+            window.URL.revokeObjectURL(url)
+          })
+          .catch(er => {
+            console.log(er)
+          })
+    }
   }
 }
 </script>
