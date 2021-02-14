@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png"><br/>
+<!--    <img alt="Vue logo" src="./assets/logo.png"><br/>-->
     {{line}}<br/>
     <button @click="clickAction">Click</button>
     <br/>
@@ -16,11 +16,44 @@
     <div>
       <button @click="makeExcelFile3">Excel3</button>
     </div>
+    <div>
+      <table id="table">
+        <thead>
+        <tr>
+          <th>id</th>
+          <th>name</th>
+          <th>age</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>1</td>
+          <td>aa</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>bb</td>
+          <td>46</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>cc</td>
+          <td>84</td>
+        </tr>
+        </tbody>
+      </table>
+      <button @click="makeExcelFile4">Excel4</button>
+    </div>
+    <div>
+      <button @click="makeExcelFile5">Excel5</button>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import Xlsx from 'xlsx'
 
 export default {
   name: 'App',
@@ -109,18 +142,36 @@ export default {
           }).catch(er => {
             console.log(er)
           })
+    },
+    makeExcelFile4 () {
+      let tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">'
+      tab_text += '<head><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">'
+      tab_text += '<xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+      tab_text += '<x:Name>Test Sheet</x:Name>'
+      tab_text += '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>'
+      tab_text += '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
+      tab_text += "<table>"
+      const temp = document.getElementById('table').innerHTML
+      // console.log(temp)
+      tab_text += temp
+      tab_text += '</table></body></html>'
+      console.log(tab_text)
+      const fileName = 'exampleTable.xls'
+      const a_tag = document.createElement('a')
+      const blob = new Blob([tab_text], { type: 'application/vnd.ms-excel;charset=utf-8;' })
+      a_tag.href = window.URL.createObjectURL(blob)
+      a_tag.download = fileName
+      a_tag.click()
+    },
+    makeExcelFile5 () {
+      const workBook = Xlsx.utils.book_new()
+      const workSheet = Xlsx.utils.json_to_sheet(this.data1)
+      Xlsx.utils.book_append_sheet(workBook, workSheet, 'example')
+      Xlsx.writeFile(workBook, 'example.xlsx')
     }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
